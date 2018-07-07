@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Menu;
@@ -22,9 +25,11 @@ public class MainActivity extends AppCompatActivity {
 
     //Local variables
     private List<Reminder> mReminders;
-    private ArrayAdapter mAdapter;
-    private ListView mListView;
+        private ListView mListView;
     private EditText mNewReminderText;
+
+    private ReminderAdapter mAdapter;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +39,16 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Initialize the local variables
-        mListView = findViewById(R.id.listView_main);
+
         mNewReminderText = findViewById(R.id.editText_main);
 
         mReminders = new ArrayList<>();
-        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mReminders);
-        mListView.setAdapter(mAdapter);
+
+
+        mRecyclerView = findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+updateUI();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -55,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                     mReminders.add(newReminder);
 
 //Tell the adapter that the data set has been modified: the screen will be refreshed.
-                    mAdapter.notifyDataSetChanged();
+updateUI();
 
                     //Initialize the EditText for the next item
                     mNewReminderText.setText("");
@@ -68,17 +77,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+/*
+Add a touch helper to the RecyclerView to recognize when a user swipes to delete a list entry.
+An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
+and uses callbacks to signal when a user is performing these actions.
+*/
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder
+                            target) {
+                        return false;
+                    }
 
-        //Set the long click listener for reminders in the list in order to remove a reminder
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                mReminders.remove(i);
-                mAdapter.notifyDataSetChanged();
-                return true;
-            }
-        });
+                    //Called when a user swipes left or right on a ViewHolder
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
 
+                        //Get the index corresponding to the selected position
+                        int position = (viewHolder.getAdapterPosition());
+                        mReminders.remove(position);
+                        mAdapter.notifyItemRemoved(position);
+                    }
+                };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
 
     }
 
@@ -103,4 +127,14 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void updateUI() {
+        if (mAdapter == null) {
+            mAdapter = new ReminderAdapter(mReminders);
+            mRecyclerView.setAdapter(mAdapter);
+        } else {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
 }
