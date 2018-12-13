@@ -22,17 +22,17 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     @Override
     public ReminderAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        LayoutInflater inflater= LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(android.R.layout.simple_list_item_1, null);
-// Return a new holder instance
+        // Return a new holder instance
         ReminderAdapter.ViewHolder viewHolder = new ReminderAdapter.ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ReminderAdapter.ViewHolder holder, int position) {
-        Reminder reminder =  mReminders.get(position);
-        holder.textView.setText(reminder.getmReminderText());
+        Reminder reminder = mReminders.get(position);
+        holder.textView.setText(reminder.getReminderText());
     }
 
     @Override
@@ -41,11 +41,11 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView textView;
+        TextView textView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            textView= itemView.findViewById(android.R.id.text1);
+            textView = itemView.findViewById(android.R.id.text1);
         }
     }
 
