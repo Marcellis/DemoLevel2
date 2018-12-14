@@ -10,26 +10,18 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-
     //Local variables
     private List<Reminder> mReminders;
-        private ListView mListView;
-    private EditText mNewReminderText;
-
     private ReminderAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private EditText mNewReminderText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,16 +31,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Initialize the local variables
-
+        mRecyclerView = findViewById(R.id.recyclerView);
         mNewReminderText = findViewById(R.id.editText_main);
 
         mReminders = new ArrayList<>();
-
-
-        mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-updateUI();
+        updateUI();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -58,13 +47,13 @@ updateUI();
                 String text = mNewReminderText.getText().toString();
                 Reminder newReminder = new Reminder(text);
 
-//Check if some text has been added
+                //Check if some text has been added
                 if (!(TextUtils.isEmpty(text))) {
                     //Add the text to the list (datamodel)
                     mReminders.add(newReminder);
 
-//Tell the adapter that the data set has been modified: the screen will be refreshed.
-updateUI();
+                    //Tell the adapter that the data set has been modified: the screen will be refreshed.
+                    updateUI();
 
                     //Initialize the EditText for the next item
                     mNewReminderText.setText("");
@@ -73,20 +62,18 @@ updateUI();
                     Snackbar.make(view, "Please enter some text in the textfield", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
 
-
             }
         });
 
-/*
-Add a touch helper to the RecyclerView to recognize when a user swipes to delete a list entry.
-An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
-and uses callbacks to signal when a user is performing these actions.
-*/
+        /*
+        Add a touch helper to the RecyclerView to recognize when a user swipes to delete a list entry.
+        An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
+        and uses callbacks to signal when a user is performing these actions.
+        */
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
                 new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
                     @Override
-                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder
-                            target) {
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                         return false;
                     }
 
@@ -103,29 +90,6 @@ and uses callbacks to signal when a user is performing these actions.
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void updateUI() {
