@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         mReminders = new ArrayList<>();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mRecyclerView.setHasFixedSize(true);
 
         updateUI();
 
